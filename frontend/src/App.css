@@ -1,0 +1,61 @@
+/*
+=== PURPOSE ===
+Custom animations that TailwindCSS doesn't provide.
+
+=== WHAT'S HERE ===
+- Spinner for button loading state
+- Pulsing dot for active progress step
+- Card entrance slide-up animation
+- Error toast fade-in
+*/
+
+/* ── Button Spinner ── */
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(0, 0, 0, 0.15);
+  border-top-color: black;
+  border-radius: 50%;
+  animation: spin 0.5s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Pulsing Dot: marks the currently active loading step ── */
+.animate-pulse-dot {
+  animation: pulseDot 1s ease-in-out infinite;
+}
+
+@keyframes pulseDot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.3; transform: scale(0.6); }
+}
+
+/* ── Card Entrance: slides up + fades in when results appear ── */
+.animate-card-in {
+  animation: cardIn 0.35s ease-out both;
+}
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Error Toast: drops in from top ── */
+.animate-fade-in {
+  animation: fadeIn 0.25s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translate(-50%, -12px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* ── SVG Progress Ring style ── */
+.progress-ring-circle {
+  transition: stroke-dashoffset 0.6s ease-in-out;
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+}

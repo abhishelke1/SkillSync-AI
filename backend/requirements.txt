@@ -1,0 +1,9 @@
+# Backend dependencies for AI Skill Gap Checker
+# Install with: pip install -r requirements.txt
+
+fastapi          # Web framework for building APIs
+uvicorn          # ASGI server to run FastAPI
+python-multipart # Required for file uploads (PDF)
+PyMuPDF          # PDF text extraction (imported as 'fitz')
+groq             # Groq AI API client (fast LLaMA inference)
+python-dotenv    # Load environment variables from .env file
