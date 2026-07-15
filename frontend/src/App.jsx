@@ -15,7 +15,19 @@ import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import "./App.css";
 
-const API_URL = (import.meta.env.VITE_API_URL || "https://skillsync-ai-ojga.onrender.com").replace(/\/+$/, "");
+const getApiUrl = () => {
+  let url = import.meta.env.VITE_API_URL || "https://skillsync-ai-ojga.onrender.com";
+  url = url.trim().replace(/\/+$/, "");
+  if (url && !/^https?:\/\//i.test(url)) {
+    if (/localhost|127\.0\.0\.1/i.test(url)) {
+      return `http://${url}`;
+    }
+    return `https://${url}`;
+  }
+  return url;
+};
+
+const API_URL = getApiUrl();
 
 // Steps shown during the loading sequence
 const STEPS = [
