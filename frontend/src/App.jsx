@@ -29,6 +29,19 @@ const getApiUrl = () => {
 
 const API_URL = getApiUrl();
 
+// Axios wrapper: retries once on network errors (handles Render cold starts)
+const apiPost = async (url, data, config = {}) => {
+  try {
+    return await axios.post(url, data, { timeout: 90000, ...config });
+  } catch (err) {
+    // Network error (no response) = server likely waking up — retry once
+    if (!err.response) {
+      return await axios.post(url, data, { timeout: 90000, ...config });
+    }
+    throw err;
+  }
+};
+
 // Steps shown during the loading sequence
 const STEPS = [
   "Reading resume...",
@@ -170,11 +183,11 @@ function App() {
       await new Promise((r) => setTimeout(r, 400));
       setCurrentStep(1);
 
-      const extractRes = await axios.post(`${API_URL}/extract-skills`, formData);
+      const extractRes = await apiPost(`${API_URL}/extract-skills`, formData);
 
       // Step 2: Compare skills
       setCurrentStep(2);
-      const compareRes = await axios.post(`${API_URL}/compare`, {
+      const compareRes = await apiPost(`${API_URL}/compare`, {
         resume_skills: extractRes.data.resume_skills,
         jd_skills: extractRes.data.jd_skills,
       });
@@ -182,7 +195,7 @@ function App() {
 
       // Step 3: Generate verdict
       setCurrentStep(3);
-      const verdictRes = await axios.post(`${API_URL}/verdict`, {
+      const verdictRes = await apiPost(`${API_URL}/verdict`, {
         matched_skills: compareRes.data.matched_skills,
         missing_skills: compareRes.data.missing_skills,
         additional_skills: compareRes.data.additional_skills,
@@ -193,7 +206,10 @@ function App() {
       // Record how long the full pipeline took
       setProcessingTime(((performance.now() - startTime) / 1000).toFixed(1));
     } catch (err) {
-      const msg = err.response?.data?.detail || "Something went wrong. Please try again.";
+      // Network error (no response) = server unreachable even after retry
+      const msg = !err.response
+        ? "Server is starting up. Please wait a moment and try again."
+        : err.response?.data?.detail || "Something went wrong. Please try again.";
       setError(msg);
     } finally {
       setLoading(false);
